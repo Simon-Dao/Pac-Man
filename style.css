@@ -1,0 +1,62 @@
+body {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#title {
+    color: yellow;
+    border: orange solid 3px;
+}
+
+#score-text {
+    color: white;
+}
+
+#event-text {
+    color: white;
+    text-decoration: underline;
+}
+
+.grid {
+    margin-top: 5vh;
+    display: flex;
+    flex-wrap: wrap;
+    width: 560px;
+    height: 560px;
+    border: solid black;
+}
+
+.grid div {
+    width: 20px;
+    height: 20px;
+}
+
+.pac-dot {
+    background-color: white;
+    border: 5px solid black;
+    box-sizing: border-box;
+}
+
+.wall {
+    background-color: blue;
+}
+
+.power-pellet {
+    background-color: whitesmoke;
+    border-radius: 10px;
+    border: 2px solid black;
+    box-sizing: border-box;
+}
+
+.pac-man {
+    position: relative;
+    background-color: yellow;
+    border-radius: 5px;
+    border: none;
+}
+
+.empty {
+}
