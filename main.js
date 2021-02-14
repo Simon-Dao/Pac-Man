@@ -8,14 +8,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
+    let pacmanCurrentIndex = 490
+
+    const pinkGhost = new Ghost('pink-ghost',432)
+    const redGhost = new Ghost('red-ghost',472)
+    const blueGhost = new Ghost('blue-ghost',473)
+    const orangeGhost = new Ghost('orange-ghost',472)
 
     createBoard()
+    loadEntities()
     //GAME LOOP    
     setInterval(tick, timePerTick)
 
-    let pacmanCurrentIndex = 490
-
-    squares[pacmanCurrentIndex].classList.add('pac-man')
 
     document.addEventListener('keyup', updatePacmanDirection) 
 
@@ -46,9 +50,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
     
+    function loadEntities() {
+        squares[pacmanCurrentIndex].classList.add('pac-man')
+        squares[pinkGhost.index].classList.add(pinkGhost.index)
+        squares[redGhost.index].classList.add(redGhost.index)
+        squares[orangeGhost.index].classList.add(orangeGhost.name)
+        squares[blueGhost.index].classList.add(blueGhost.name)
+    }
+
     function tick() {
         if(!RUNNING) return
         movePacman()
+        moveGhosts()
         pacDotEaten()
     }
 
@@ -114,8 +127,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
         resetAnimation()
         squares[pacmanCurrentIndex].classList.add('pac-man')
         pacDotEaten()
-        //powerPelletEaten()
+        powerPelletEaten()
         checkForGameOver()
+    }
+
+    function moveGhosts() {
+
     }
 
     function animate() {
