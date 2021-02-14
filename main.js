@@ -8,16 +8,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
-<<<<<<< HEAD
     let pacmanCurrentIndex = 490
 
-    const pinkGhost = new Ghost('pink-ghost',432)
-    const redGhost = new Ghost('red-ghost',472)
-    const blueGhost = new Ghost('blue-ghost',473)
-    const orangeGhost = new Ghost('orange-ghost',472)
-=======
-    let powerTime = 0
->>>>>>> working
+    const pinkGhost = new Ghost('pink-ghost',405)
+    const redGhost = new Ghost('red-ghost',406)
+    const blueGhost = new Ghost('blue-ghost',403)
+    const orangeGhost = new Ghost('orange-ghost',404)
 
     createBoard()
     loadEntities()
@@ -56,8 +52,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     
     function loadEntities() {
         squares[pacmanCurrentIndex].classList.add('pac-man')
-        squares[pinkGhost.index].classList.add(pinkGhost.index)
-        squares[redGhost.index].classList.add(redGhost.index)
+        squares[pinkGhost.index].classList.add(pinkGhost.name)
+        squares[redGhost.index].classList.add(redGhost.name)
         squares[orangeGhost.index].classList.add(orangeGhost.name)
         squares[blueGhost.index].classList.add(blueGhost.name)
     }
