@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function updatePacmanDirection(event) {
-            
+        if(!RUNNING) return
         squares[pacmanCurrentIndex].classList.remove('pac-man')
         resetAnimation()
         switch(event.keyCode) {
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     if(!squares[pacmanCurrentIndex-1].classList.contains('wall'))
                     pos+= 5
                     current.style.right = pos + 'px'
-                    break
+                   break
                 case 'up':
                     if(!squares[pacmanCurrentIndex-width].classList.contains('wall'))
                     pos+= 5
