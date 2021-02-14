@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
+    let powerTime = 0
 
     createBoard()
     //GAME LOOP    
@@ -87,6 +88,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     
     function movePacman() {
         squares[pacmanCurrentIndex].classList.remove('pac-man')
+        squares[pacmanCurrentIndex].classList.remove('powered')
         
         switch(direction) {
             case 'left':
@@ -114,7 +116,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         resetAnimation()
         squares[pacmanCurrentIndex].classList.add('pac-man')
         pacDotEaten()
-        //powerPelletEaten()
+        powerPelletEaten()
         checkForGameOver()
     }
 
@@ -163,7 +165,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     
         let current = squares[pacmanCurrentIndex]
         
-        checkSquaresFor('power-pellet')
         if(checkSquaresFor('pac-dot')) {
             totalDots--
         }
@@ -171,6 +172,17 @@ document.addEventListener('DOMContentLoaded', ()=> {
         setScoreBoard()
     }
     
+    function powerPelletEaten() {
+        if(checkSquaresFor('power-pellet'))
+            powerTime += 50
+
+        powerTime = powerTime > 0 ? powerTime-1 : 0 
+        if(powerTime > 0) 
+            squares[pacmanCurrentIndex].classList.add('powered')
+        else 
+            squares[pacmanCurrentIndex].classList.remove('powered')
+    }
+
     function checkSquaresFor(className) {
         let current = squares[pacmanCurrentIndex]
         let containsName = false
