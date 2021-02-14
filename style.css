@@ -58,6 +58,10 @@ body {
     border: none;
 }
 
+.powered {
+    background-color: blue;
+}
+
 .empty {
 }
 

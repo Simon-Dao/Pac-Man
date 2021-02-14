@@ -8,12 +8,16 @@ document.addEventListener('DOMContentLoaded', ()=> {
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
+<<<<<<< HEAD
     let pacmanCurrentIndex = 490
 
     const pinkGhost = new Ghost('pink-ghost',432)
     const redGhost = new Ghost('red-ghost',472)
     const blueGhost = new Ghost('blue-ghost',473)
     const orangeGhost = new Ghost('orange-ghost',472)
+=======
+    let powerTime = 0
+>>>>>>> working
 
     createBoard()
     loadEntities()
@@ -75,7 +79,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function updatePacmanDirection(event) {
-            
+        if(!RUNNING) return
         squares[pacmanCurrentIndex].classList.remove('pac-man')
         resetAnimation()
         switch(event.keyCode) {
@@ -100,6 +104,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     
     function movePacman() {
         squares[pacmanCurrentIndex].classList.remove('pac-man')
+        squares[pacmanCurrentIndex].classList.remove('powered')
         
         switch(direction) {
             case 'left':
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     if(!squares[pacmanCurrentIndex-1].classList.contains('wall'))
                     pos+= 5
                     current.style.right = pos + 'px'
-                    break
+                   break
                 case 'up':
                     if(!squares[pacmanCurrentIndex-width].classList.contains('wall'))
                     pos+= 5
@@ -180,7 +185,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     
         let current = squares[pacmanCurrentIndex]
         
-        checkSquaresFor('power-pellet')
         if(checkSquaresFor('pac-dot')) {
             totalDots--
         }
@@ -188,6 +192,17 @@ document.addEventListener('DOMContentLoaded', ()=> {
         setScoreBoard()
     }
     
+    function powerPelletEaten() {
+        if(checkSquaresFor('power-pellet'))
+            powerTime += 50
+
+        powerTime = powerTime > 0 ? powerTime-1 : 0 
+        if(powerTime > 0) 
+            squares[pacmanCurrentIndex].classList.add('powered')
+        else 
+            squares[pacmanCurrentIndex].classList.remove('powered')
+    }
+
     function checkSquaresFor(className) {
         let current = squares[pacmanCurrentIndex]
         let containsName = false
