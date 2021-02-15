@@ -59,7 +59,10 @@ body {
 }
 
 .powered {
-    background-color: blue;
+    position: relative;
+    background-color: blueviolet;
+    border-radius: 5px;
+    border: none;
 }
 
 .empty {
@@ -67,7 +70,7 @@ body {
 
 .blue-ghost {
     position: relative;
-    background-color: blue;
+    background-color: cornflowerblue;
     border-radius: 5px;
     border: none;
 }
