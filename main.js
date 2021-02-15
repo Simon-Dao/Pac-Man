@@ -128,6 +128,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     pacmanCurrentIndex+=width
                 break
         }
+        if(pacmanCurrentIndex === 391) pacmanCurrentIndex = 364
+        else if(pacmanCurrentIndex === 364) pacmanCurrentIndex = 391
+
         animate()
         resetAnimation()
         squares[pacmanCurrentIndex].classList.add('pac-man')
@@ -145,31 +148,53 @@ document.addEventListener('DOMContentLoaded', ()=> {
                    !squares[ghost.index-1].classList.contains('wall')) 
                    ghost.index-=1
                 else 
-                    ghost.direction = randomDirection() 
+                    ghost.direction = randomDirection(ghost.direction) 
                 break
             case 'up':
                 if(ghost.index -  width >= 0 && 
                     !squares[ghost.index-width].classList.contains('wall')) 
                     ghost.index-=width
                 else 
-                    ghost.direction = randomDirection() 
+                    ghost.direction = randomDirection(ghost.direction) 
                 break
             case 'right':
                 if(ghost.index % width < width - 1 && 
                     !squares[ghost.index+1].classList.contains('wall')) 
                     ghost.index+=1
                 else 
-                    ghost.direction = randomDirection() 
+                    ghost.direction = randomDirection(ghost.direction) 
                 break
             case 'down':
                 if(ghost.index + width < width * width && 
                     !squares[ghost.index+width].classList.contains('wall')) 
                     ghost.index+=width
                 else 
-                    ghost.direction = randomDirection() 
+                    ghost.direction = randomDirection(ghost.direction) 
                 break
         }
+        if(atJunction(ghost)) {
+            ghost.direction = randomDirection(ghost.direction)
+        } 
+
         squares[ghost.index].classList.add(ghost.name)
+    }
+
+    function atJunction(ghost) {
+        let count = 0
+        //check left
+        if(!squares[ghost.index-1].classList.contains('wall')&&
+        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        //check right
+        if(!squares[ghost.index+1].classList.contains('wall')&&
+        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        //check up
+        if(!squares[ghost.index-width].classList.contains('wall')&&
+        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        //check down
+        if(!squares[ghost.index+width].classList.contains('wall') &&
+        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+
+        return count >= 3
     }
 
     function randomDirection() {
@@ -177,6 +202,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         let randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
         return directions[randomIndex]
+    }
+
+    function randomDirection(oldDirection) {
+        let directions = ['up','down','left','right']
+        let randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
+        let newDirection = directions[randomIndex]
+        while(newDirection === oldDirection) {
+            randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
+            newDirection = directions[randomIndex]
+        }
+
+        return newDirection
     }
 
     function animate() {
