@@ -6,6 +6,10 @@ body {
     flex-direction: column;
 }
 
+.text-container {
+    display: flex;
+}
+
 #title {
     color: yellow;
     border: orange solid 3px;
@@ -18,6 +22,10 @@ body {
 #event-text {
     color: white;
     text-decoration: underline;
+}
+
+#lives-text {
+    color: white;
 }
 
 .grid {
@@ -84,7 +92,7 @@ body {
 
 .orange-ghost {
     position: relative;
-    background-color: orange;
+    background-color: #FF6700;
     border-radius: 5px;
     border: none;
 }

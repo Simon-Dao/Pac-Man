@@ -2,17 +2,22 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const grid = document.querySelector('.grid')
     const scoreDisplay = document.querySelector('#score-text')
     const eventDisplay = document.querySelector('#event-text')
+    const livesDisplay = document.querySelector('lives-text')
     const width = 28
     const squares = []
-    const timePerTick = 200 
+    //should be 200
+    const timePerTick = 200
+    let pacLives = 3 
     let powerTime = 0
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
     let pacmanCurrentIndex = 490
+    let opposites = new Map()
+    getOppositeDirectionMap()
 
-    const pinkGhost = new Ghost('pink-ghost',405)
-    const redGhost = new Ghost('red-ghost',406)
+    const pinkGhost = new Ghost('pink-ghost',322)
+    const redGhost = new Ghost('red-ghost',350)
     const blueGhost = new Ghost('blue-ghost',377)
     const orangeGhost = new Ghost('orange-ghost',378)
 
@@ -38,9 +43,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 case 1:
                     squares[i].classList.add('wall')
                     break
-                case 2:
-                    squares[i].classList.add('ghost-lair')
-                    break
                 case 3:
                     squares[i].classList.add('power-pellet')
                     break
@@ -62,10 +64,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function tick() {
         if(!RUNNING) return
         movePacman()
+        ///*
         moveGhosts(blueGhost)
         moveGhosts(pinkGhost)
         moveGhosts(orangeGhost)
         moveGhosts(redGhost)
+        //*/
         pacDotEaten()
         powerPelletEaten()
     }
@@ -103,6 +107,13 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
     
+    function getOppositeDirectionMap() {
+        opposites.set('left','right')
+        opposites.set('right','left')
+        opposites.set('up','down')
+        opposites.set('down','up')
+    }
+
     function movePacman() {
         squares[pacmanCurrentIndex].classList.remove('pac-man')
         
@@ -131,8 +142,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if(pacmanCurrentIndex === 391) pacmanCurrentIndex = 364
         else if(pacmanCurrentIndex === 364) pacmanCurrentIndex = 391
 
-        animate()
-        resetAnimation()
+        //animate()
+        //resetAnimation()
         squares[pacmanCurrentIndex].classList.add('pac-man')
         pacDotEaten()
         checkForGameOver()
@@ -148,51 +159,56 @@ document.addEventListener('DOMContentLoaded', ()=> {
                    !squares[ghost.index-1].classList.contains('wall')) 
                    ghost.index-=1
                 else 
-                    ghost.direction = randomDirection(ghost.direction) 
+                    ghost.direction = randomDirection(ghost,ghost.direction) 
                 break
             case 'up':
                 if(ghost.index -  width >= 0 && 
                     !squares[ghost.index-width].classList.contains('wall')) 
                     ghost.index-=width
                 else 
-                    ghost.direction = randomDirection(ghost.direction) 
+                    ghost.direction = randomDirection(ghost,ghost.direction) 
                 break
             case 'right':
                 if(ghost.index % width < width - 1 && 
                     !squares[ghost.index+1].classList.contains('wall')) 
                     ghost.index+=1
                 else 
-                    ghost.direction = randomDirection(ghost.direction) 
+                    ghost.direction = randomDirection(ghost,ghost.direction) 
                 break
             case 'down':
                 if(ghost.index + width < width * width && 
                     !squares[ghost.index+width].classList.contains('wall')) 
                     ghost.index+=width
                 else 
-                    ghost.direction = randomDirection(ghost.direction) 
+                    ghost.direction = randomDirection(ghost,ghost.direction) 
                 break
         }
         if(atJunction(ghost)) {
-            ghost.direction = randomDirection(ghost.direction)
+            ghost.direction = randomDirection(ghost,ghost.direction)
         } 
+        if(ghost.index === 391) ghost.index = 364
+        else if(ghost.index === 364) ghost.index = 391
 
         squares[ghost.index].classList.add(ghost.name)
+    }
+
+    function checkForPac(ghost) {
+        if(ghost.index === pacmanCurrentIndex) {
+            pacLives--
+            livesDisplay.innerHTML = ''+pacLives
+        }
     }
 
     function atJunction(ghost) {
         let count = 0
         //check left
-        if(!squares[ghost.index-1].classList.contains('wall')&&
-        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        if(!squares[ghost.index-1].classList.contains('wall')) count++
         //check right
-        if(!squares[ghost.index+1].classList.contains('wall')&&
-        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        if(!squares[ghost.index+1].classList.contains('wall')) count++
         //check up
-        if(!squares[ghost.index-width].classList.contains('wall')&&
-        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        if(!squares[ghost.index-width].classList.contains('wall')) count++
         //check down
-        if(!squares[ghost.index+width].classList.contains('wall') &&
-        !squares[ghost.index+width].classList.contains('ghost-lair')) count++
+        if(!squares[ghost.index+width].classList.contains('wall')) count++
 
         return count >= 3
     }
@@ -204,16 +220,35 @@ document.addEventListener('DOMContentLoaded', ()=> {
         return directions[randomIndex]
     }
 
-    function randomDirection(oldDirection) {
-        let directions = ['up','down','left','right']
+    function randomDirection(ghost,oldDirection) {
+        console.log('original direction '+oldDirection)
+        oldDirection = opposites.get(oldDirection)
+        let directions = getAvailableDirections(ghost)
         let randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
         let newDirection = directions[randomIndex]
         while(newDirection === oldDirection) {
             randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
             newDirection = directions[randomIndex]
         }
-
         return newDirection
+    }
+
+    function getAvailableDirections(ghost) {
+        let availableDirections = []
+        //check left
+        if(!squares[ghost.index-1].classList.contains('wall')) 
+        availableDirections.push('left')
+        //check right
+        if(!squares[ghost.index+1].classList.contains('wall')) 
+        availableDirections.push('right')
+        //check up
+        if(!squares[ghost.index-width].classList.contains('wall')) 
+        availableDirections.push('up')
+        //check down
+        if(!squares[ghost.index+width].classList.contains('wall')) 
+        availableDirections.push('down')
+
+        return availableDirections  
     }
 
     function animate() {
@@ -317,5 +352,3 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
     }
 })
-
-
