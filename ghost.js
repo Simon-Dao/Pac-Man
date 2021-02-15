@@ -5,5 +5,6 @@ class Ghost {
         this.index = index
         this.spawnIndex = index
         this.direction = 'up'
+        this.powered = false
     }
 }

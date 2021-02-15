@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const grid = document.querySelector('.grid')
     const scoreDisplay = document.querySelector('#score-text')
     const eventDisplay = document.querySelector('#event-text')
-    const livesDisplay = document.querySelector('lives-text')
+    const livesDisplay = document.querySelector('#lives-text')
     const width = 28
     const squares = []
     //should be 200
@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     loadEntities()
     //GAME LOOP    
     setInterval(tick, timePerTick)
-
 
     document.addEventListener('keyup', updatePacmanDirection) 
 
@@ -65,10 +64,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if(!RUNNING) return
         movePacman()
         ///*
-        moveGhosts(blueGhost)
-        moveGhosts(pinkGhost)
-        moveGhosts(orangeGhost)
-        moveGhosts(redGhost)
+        updateGhosts(blueGhost)
+        updateGhosts(pinkGhost)
+        updateGhosts(orangeGhost)
+        updateGhosts(redGhost)
         //*/
         pacDotEaten()
         powerPelletEaten()
@@ -142,14 +141,13 @@ document.addEventListener('DOMContentLoaded', ()=> {
         if(pacmanCurrentIndex === 391) pacmanCurrentIndex = 364
         else if(pacmanCurrentIndex === 364) pacmanCurrentIndex = 391
 
-        //animate()
-        //resetAnimation()
+        animatePacman()
         squares[pacmanCurrentIndex].classList.add('pac-man')
         pacDotEaten()
         checkForGameOver()
     }
 
-    function moveGhosts(ghost) {
+    function updateGhosts(ghost) {
         squares[ghost.index].classList.remove(ghost.name)
         squares[ghost.index].classList.remove('powered')
         
@@ -183,19 +181,24 @@ document.addEventListener('DOMContentLoaded', ()=> {
                     ghost.direction = randomDirection(ghost,ghost.direction) 
                 break
         }
-        if(atJunction(ghost)) {
-            ghost.direction = randomDirection(ghost,ghost.direction)
-        } 
+        if(atJunction(ghost)) ghost.direction = randomDirection(ghost,ghost.direction)
         if(ghost.index === 391) ghost.index = 364
         else if(ghost.index === 364) ghost.index = 391
-
         squares[ghost.index].classList.add(ghost.name)
+        checkForPac(ghost)
+        animateGhost(ghost)
+        checkGhostEaten(ghost)
     }
 
     function checkForPac(ghost) {
-        if(ghost.index === pacmanCurrentIndex) {
+        if(ghost.index === pacmanCurrentIndex && powerTime < 0 && !ghost.powered)
             pacLives--
-            livesDisplay.innerHTML = ''+pacLives
+    }
+
+    function checkGhostEaten(ghost) {
+        if(powerTime > 0 && ghost.index === pacmanCurrentIndex && ghost.powered) {
+            ghost.index = ghost.spawnIndex
+            ghost.powered = false
         }
     }
 
@@ -221,7 +224,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function randomDirection(ghost,oldDirection) {
-        console.log('original direction '+oldDirection)
         oldDirection = opposites.get(oldDirection)
         let directions = getAvailableDirections(ghost)
         let randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
@@ -251,7 +253,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
         return availableDirections  
     }
 
-    function animate() {
+    function animatePacman() {
         let current = squares[pacmanCurrentIndex]
         let pos = 0
     
@@ -283,6 +285,44 @@ document.addEventListener('DOMContentLoaded', ()=> {
                 window.clearInterval(intervalID);
             }
         }, timePerTick/4);
+        resetAnimation()
+    }
+
+    function animateGhost(ghost) {
+        let current = squares[ghost.index]
+        let pos = 0
+    
+        var x = 0;
+        var intervalID = setInterval(function () {
+            switch(ghost.direction) {
+                case 'right':
+                    if(!squares[ghost.index+1].classList.contains('wall'))
+                    pos+= 5
+                    current.style.right = -pos + 'px'
+                    break
+                case 'left':
+                    if(!squares[ghost.index-1].classList.contains('wall'))
+                    pos+= 5
+                    current.style.right = pos + 'px'
+                   break
+                case 'up':
+                    if(!squares[ghost.index-width].classList.contains('wall'))
+                    pos+= 5
+                    current.style.top = -pos + 'px'
+                    break
+                case 'down':
+                    if(!squares[ghost.index+width].classList.contains('wall'))
+                    pos+= 5
+                    current.style.top = pos + 'px'
+                    break
+            }
+            if (++x === 4) {
+                window.clearInterval(intervalID);
+            }
+        }, timePerTick/4);
+
+        current.style.right = '0px'
+        current.style.top = '0px'
     }
 
     function resetAnimation() {
@@ -317,6 +357,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
             squares[redGhost.index].classList.add('powered')
             squares[orangeGhost.index].classList.add('powered')
             squares[blueGhost.index].classList.add('powered')
+            pinkGhost.powered = true
+            redGhost.powered = true
+            blueGhost.powered = true
+            orangeGhost.powered = true
         } else { 
             squares[pinkGhost.index].classList.add(pinkGhost.name)
             squares[redGhost.index].classList.add(redGhost.name)
@@ -326,6 +370,10 @@ document.addEventListener('DOMContentLoaded', ()=> {
             squares[redGhost.index].classList.remove('powered')
             squares[orangeGhost.index].classList.remove('powered')
             squares[blueGhost.index].classList.remove('powered')
+            pinkGhost.powered = false
+            redGhost.powered = false
+            blueGhost.powered = false
+            orangeGhost.powered = false
         }
     }
 
@@ -343,12 +391,18 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function setScoreBoard() {
         scoreDisplay.innerHTML = totalDots+''
+        livesDisplay.innerHTML = ''+pacLives
     }
 
     function checkForGameOver() {
         if(totalDots == 0) {
             RUNNING = false
             eventDisplay.innerHTML = 'PACMAN WINS!'
+        }
+
+        if(pacLives == 0) {
+            RUNNING = false
+            eventDisplay.innerHTML = 'GHOSTS WIN!'
         }
     }
 })
