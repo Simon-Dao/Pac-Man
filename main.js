@@ -1,10 +1,8 @@
 //todo make pacman stop turning black when turning
 //todo implement a more object oriented design to your code
-//todo implement a thing that makes pacman die
-//todo implement a way for ghosts to die
-//todo implement a way to restart the game
 //todo add sound to the game
 //todo make the ghosts have their own personalities
+//todo get a better system for ghosts to detect collisions with pacman
 
 document.addEventListener('DOMContentLoaded', ()=> {
     const grid = document.querySelector('.grid')
@@ -16,7 +14,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     //should be 200
     const timePerTick = 200
     let pacLives = 3 
-    let powerTime = 0
+    let powerTime = 10000
     let direction = 'up'
     let RUNNING = true
     let totalDots = countPacDots()
@@ -201,7 +199,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkForPac(ghost) {
-        if(ghost.index === pacmanCurrentIndex) { //&& powerTime < 0 && !ghost.powered) {
+        if(ghost.index === pacmanCurrentIndex && powerTime == 0 && !ghost.powered) {
             pacLives--
             resetGame()
         } 
@@ -218,6 +216,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function checkGhostEaten(ghost) {
         if(powerTime > 0 && ghost.index === pacmanCurrentIndex && ghost.powered) {
+            squares[ghost.index].className = 'empty'
             ghost.index = ghost.spawnIndex
             ghost.powered = false
         }
