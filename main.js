@@ -1,3 +1,11 @@
+//todo make pacman stop turning black when turning
+//todo implement a more object oriented design to your code
+//todo implement a thing that makes pacman die
+//todo implement a way for ghosts to die
+//todo implement a way to restart the game
+//todo add sound to the game
+//todo make the ghosts have their own personalities
+
 document.addEventListener('DOMContentLoaded', ()=> {
     const grid = document.querySelector('.grid')
     const scoreDisplay = document.querySelector('#score-text')
@@ -20,6 +28,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const redGhost = new Ghost('red-ghost',350)
     const blueGhost = new Ghost('blue-ghost',377)
     const orangeGhost = new Ghost('orange-ghost',378)
+
+    let ghosts = [pinkGhost, redGhost, blueGhost, orangeGhost]
 
     createBoard()
     loadEntities()
@@ -51,7 +61,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
             }
         }
     }
-    
+
     function loadEntities() {
         squares[pacmanCurrentIndex].classList.add('pac-man')
         squares[pinkGhost.index].classList.add(pinkGhost.name)
@@ -191,8 +201,19 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkForPac(ghost) {
-        if(ghost.index === pacmanCurrentIndex && powerTime < 0 && !ghost.powered)
+        if(ghost.index === pacmanCurrentIndex) { //&& powerTime < 0 && !ghost.powered) {
             pacLives--
+            resetGame()
+        } 
+    }
+
+    function resetGame() {
+        ghosts.forEach((ghost) => {
+            squares[ghost.index].className = 'empty'
+            ghost.index = ghost.spawnIndex
+        })
+        layout = original
+        pacmanCurrentIndex = 490
     }
 
     function checkGhostEaten(ghost) {
@@ -395,6 +416,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkForGameOver() {
+        
+        /*
         if(totalDots == 0) {
             RUNNING = false
             eventDisplay.innerHTML = 'PACMAN WINS!'
@@ -404,5 +427,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
             RUNNING = false
             eventDisplay.innerHTML = 'GHOSTS WIN!'
         }
+        */
     }
 })
