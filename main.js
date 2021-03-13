@@ -13,12 +13,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const squares = []
     //should be 200
     const timePerTick = 200
-    let pacLives = 3 
-    let powerTime = 10000
-    let direction = 'up'
+    let powerTime = 0
     let RUNNING = true
     let totalDots = countPacDots()
-    let pacmanCurrentIndex = 490
     let opposites = new Map()
     getOppositeDirectionMap()
 
@@ -26,6 +23,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     const redGhost = new Ghost('red-ghost',350)
     const blueGhost = new Ghost('blue-ghost',377)
     const orangeGhost = new Ghost('orange-ghost',378)
+    const pac = new Pacman(490)
 
     let ghosts = [pinkGhost, redGhost, blueGhost, orangeGhost]
 
@@ -61,7 +59,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function loadEntities() {
-        squares[pacmanCurrentIndex].classList.add('pac-man')
+        squares[pac.index].classList.add('pac-man')
         squares[pinkGhost.index].classList.add(pinkGhost.name)
         squares[redGhost.index].classList.add(redGhost.name)
         squares[orangeGhost.index].classList.add(orangeGhost.name)
@@ -92,24 +90,24 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function updatePacmanDirection(event) {
         if(!RUNNING) return
-        squares[pacmanCurrentIndex].classList.remove('pac-man')
+        squares[pac.index].classList.remove('pac-man')
         resetAnimation()
         switch(event.keyCode) {
             //left arrow key
             case 37:
-                direction = 'left'
+                pac.direction = 'left'
                 break
             //up arrow
             case 38:
-                direction = 'up'
+                pac.direction = 'up'
                 break
             //right arrow
             case 39:
-                direction = 'right'
+                pac.direction = 'right'
                 break
             //down arrow
             case 40:
-                direction = 'down'
+                pac.direction = 'down'
                 break
         }
     }
@@ -122,35 +120,35 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function movePacman() {
-        squares[pacmanCurrentIndex].classList.remove('pac-man')
+        squares[pac.index].classList.remove('pac-man')
         
-        switch(direction) {
+        switch(pac.direction) {
             case 'left':
-                if(pacmanCurrentIndex % width !== 0 && 
-                   !squares[pacmanCurrentIndex-1].classList.contains('wall')) 
-                   pacmanCurrentIndex-=1
+                if(pac.index % width !== 0 && 
+                   !squares[pac.index-1].classList.contains('wall')) 
+                   pac.index-=1
                 break
             case 'up':
-                if(pacmanCurrentIndex -  width >= 0 && 
-                    !squares[pacmanCurrentIndex-width].classList.contains('wall')) 
-                    pacmanCurrentIndex-=width
+                if(pac.index -  width >= 0 && 
+                    !squares[pac.index-width].classList.contains('wall')) 
+                    pac.index-=width
                 break
             case 'right':
-                if(pacmanCurrentIndex % width < width - 1 && 
-                    !squares[pacmanCurrentIndex+1].classList.contains('wall')) 
-                    pacmanCurrentIndex+=1
+                if(pac.index % width < width - 1 && 
+                    !squares[pac.index+1].classList.contains('wall')) 
+                    pac.index+=1
                 break
             case 'down':
-                if(pacmanCurrentIndex + width < width * width && 
-                    !squares[pacmanCurrentIndex+width].classList.contains('wall')) 
-                    pacmanCurrentIndex+=width
+                if(pac.index + width < width * width && 
+                    !squares[pac.index+width].classList.contains('wall')) 
+                    pac.index+=width
                 break
         }
-        if(pacmanCurrentIndex === 391) pacmanCurrentIndex = 364
-        else if(pacmanCurrentIndex === 364) pacmanCurrentIndex = 391
+        if(pac.index === 391) pac.index = 364
+        else if(pac.index === 364) pac.index = 391
 
         animatePacman()
-        squares[pacmanCurrentIndex].classList.add('pac-man')
+        squares[pac.index].classList.add('pac-man')
         pacDotEaten()
         checkForGameOver()
     }
@@ -199,8 +197,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkForPac(ghost) {
-        if(ghost.index === pacmanCurrentIndex && powerTime == 0 && !ghost.powered) {
-            pacLives--
+        if(ghost.index === pac.index && powerTime == 0 && !ghost.powered) {
+            pac.lives--
             resetGame()
         } 
     }
@@ -211,11 +209,11 @@ document.addEventListener('DOMContentLoaded', ()=> {
             ghost.index = ghost.spawnIndex
         })
         layout = original
-        pacmanCurrentIndex = 490
+        pac.index = 490
     }
 
     function checkGhostEaten(ghost) {
-        if(powerTime > 0 && ghost.index === pacmanCurrentIndex && ghost.powered) {
+        if(powerTime > 0 && ghost.index === pac.index && ghost.powered) {
             squares[ghost.index].className = 'empty'
             ghost.index = ghost.spawnIndex
             ghost.powered = false
@@ -274,29 +272,29 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function animatePacman() {
-        let current = squares[pacmanCurrentIndex]
+        let current = squares[pac.index]
         let pos = 0
     
         var x = 0;
         var intervalID = setInterval(function () {
-            switch(direction) {
+            switch(pac.direction) {
                 case 'right':
-                    if(!squares[pacmanCurrentIndex+1].classList.contains('wall'))
+                    if(!squares[pac.index+1].classList.contains('wall'))
                     pos+= 5
                     current.style.right = -pos + 'px'
                     break
                 case 'left':
-                    if(!squares[pacmanCurrentIndex-1].classList.contains('wall'))
+                    if(!squares[pac.index-1].classList.contains('wall'))
                     pos+= 5
                     current.style.right = pos + 'px'
                    break
                 case 'up':
-                    if(!squares[pacmanCurrentIndex-width].classList.contains('wall'))
+                    if(!squares[pac.index-width].classList.contains('wall'))
                     pos+= 5
                     current.style.top = -pos + 'px'
                     break
                 case 'down':
-                    if(!squares[pacmanCurrentIndex+width].classList.contains('wall'))
+                    if(!squares[pac.index+width].classList.contains('wall'))
                     pos+= 5
                     current.style.top = pos + 'px'
                     break
@@ -346,7 +344,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function resetAnimation() {
-        let current = squares[pacmanCurrentIndex]
+        let current = squares[pac.index]
 
         current.style.right = '0px'
         current.style.top = '0px'
@@ -354,7 +352,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function pacDotEaten() {
     
-        let current = squares[pacmanCurrentIndex]
+        let current = squares[pac.index]
         
         if(checkSquaresFor('pac-dot')) {
             totalDots--
@@ -398,7 +396,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkSquaresFor(className) {
-        let current = squares[pacmanCurrentIndex]
+        let current = squares[pac.index]
         let containsName = false
         if(current.classList.contains(className)) {
             current.classList.remove(className)
@@ -411,7 +409,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function setScoreBoard() {
         scoreDisplay.innerHTML = totalDots+''
-        livesDisplay.innerHTML = ''+pacLives
+        livesDisplay.innerHTML = ''+pac.lives
     }
 
     function checkForGameOver() {

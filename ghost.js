@@ -1,10 +1,8 @@
-class Ghost {
+class Ghost extends Entity{
 
     constructor(name, index) {
+        super(index)
         this.name = name
-        this.index = index
-        this.spawnIndex = index
-        this.direction = 'up'
         this.powered = false
     }
 }
