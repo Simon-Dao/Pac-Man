@@ -3,6 +3,6 @@ class Entity {
         this.index = index
         this.spawnIndex = index
         this.direction = 'up'
-        this.hitbox = new Hitbox()
+        this.hitbox = new Hitbox(index)
     }
 }

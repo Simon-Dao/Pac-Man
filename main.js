@@ -20,12 +20,12 @@ document.addEventListener('DOMContentLoaded', ()=> {
     getOppositeDirectionMap()
 
     const pinkGhost = new Ghost('pink-ghost',322)
-    const redGhost = new Ghost('red-ghost',350)
-    const blueGhost = new Ghost('blue-ghost',377)
-    const orangeGhost = new Ghost('orange-ghost',378)
+    //const redGhost = new Ghost('red-ghost',350)
+    //const blueGhost = new Ghost('blue-ghost',377)
+    //const orangeGhost = new Ghost('orange-ghost',378)
     const pac = new Pacman(490)
 
-    let ghosts = [pinkGhost, redGhost, blueGhost, orangeGhost]
+    let ghosts = [pinkGhost]//, redGhost, blueGhost, orangeGhost]
 
     createBoard()
     loadEntities()
@@ -60,20 +60,22 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function loadEntities() {
         squares[pac.index].classList.add('pac-man')
-        squares[pinkGhost.index].classList.add(pinkGhost.name)
-        squares[redGhost.index].classList.add(redGhost.name)
-        squares[orangeGhost.index].classList.add(orangeGhost.name)
-        squares[blueGhost.index].classList.add(blueGhost.name)
+        ghosts.forEach(
+            (ghost) => {
+                squares[ghost.index].classList.add(ghost.name)
+            }
+        )
     }
 
     function tick() {
         if(!RUNNING) return
         movePacman()
         ///*
-        updateGhosts(blueGhost)
-        updateGhosts(pinkGhost)
-        updateGhosts(orangeGhost)
-        updateGhosts(redGhost)
+        ghosts.forEach(
+            (ghost) => {
+                updateGhosts(ghost)
+            }
+        )
         //*/
         pacDotEaten()
         powerPelletEaten()
@@ -121,15 +123,16 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
     function movePacman() {
         squares[pac.index].classList.remove('pac-man')
-        
+
         switch(pac.direction) {
             case 'left':
                 if(pac.index % width !== 0 && 
-                   !squares[pac.index-1].classList.contains('wall')) 
-                   pac.index-=1
+                   !squares[pac.index-1].classList.contains('wall')) {
+                    pac.index-=1
+                }
                 break
             case 'up':
-                if(pac.index -  width >= 0 && 
+                if(pac.index - width >= 0 && 
                     !squares[pac.index-width].classList.contains('wall')) 
                     pac.index-=width
                 break
@@ -197,7 +200,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkForPac(ghost) {
-        if(ghost.index === pac.index && powerTime == 0 && !ghost.powered) {
+        if(ghost.hitbox.isCollided(pac.hitbox) && powerTime == 0 && !ghost.powered) {
             pac.lives--
             resetGame()
         } 
@@ -213,7 +216,7 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
 
     function checkGhostEaten(ghost) {
-        if(powerTime > 0 && ghost.index === pac.index && ghost.powered) {
+        if(powerTime > 0 && pac.hitbox.isCollided(ghost.hitbox) && ghost.powered) {
             squares[ghost.index].className = 'empty'
             ghost.index = ghost.spawnIndex
             ghost.powered = false
@@ -246,7 +249,9 @@ document.addEventListener('DOMContentLoaded', ()=> {
         let directions = getAvailableDirections(ghost)
         let randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
         let newDirection = directions[randomIndex]
-        while(newDirection === oldDirection) {
+        let x = 0;
+        while(newDirection === oldDirection && x < 4) {
+            x++
             randomIndex = Math.floor(Math.random() * Math.floor(directions.length));
             newDirection = directions[randomIndex]
         }
@@ -274,31 +279,40 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function animatePacman() {
         let current = squares[pac.index]
         let pos = 0
-    
+
         var x = 0;
         var intervalID = setInterval(function () {
             switch(pac.direction) {
                 case 'right':
-                    if(!squares[pac.index+1].classList.contains('wall'))
-                    pos+= 5
+                    if(!squares[pac.index+1].classList.contains('wall')) {
+                        pos+= 5
+                        pac.hitbox.x += .25
+                    }
                     current.style.right = -pos + 'px'
                     break
                 case 'left':
-                    if(!squares[pac.index-1].classList.contains('wall'))
-                    pos+= 5
+                    if(!squares[pac.index-1].classList.contains('wall')) {
+                        pos+= 5
+                        pac.hitbox.x -= .25
+                    }
                     current.style.right = pos + 'px'
                    break
                 case 'up':
-                    if(!squares[pac.index-width].classList.contains('wall'))
-                    pos+= 5
+                    if(!squares[pac.index-width].classList.contains('wall')) {
+                        pos+= 5
+                        pac.hitbox.y -= .25
+                    }
                     current.style.top = -pos + 'px'
                     break
                 case 'down':
-                    if(!squares[pac.index+width].classList.contains('wall'))
-                    pos+= 5
+                    if(!squares[pac.index+width].classList.contains('wall')) {
+                        pos+= 5
+                        pac.hitbox.y += .25
+                    }
                     current.style.top = pos + 'px'
                     break
             }
+
             if (++x === 4) {
                 window.clearInterval(intervalID);
             }
@@ -309,7 +323,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     function animateGhost(ghost) {
         let current = squares[ghost.index]
         let pos = 0
-    
         var x = 0;
         var intervalID = setInterval(function () {
             switch(ghost.direction) {
@@ -348,6 +361,8 @@ document.addEventListener('DOMContentLoaded', ()=> {
 
         current.style.right = '0px'
         current.style.top = '0px'
+        pac.hitbox.x = Math.floor(pac.hitbox.x)
+        pac.hitbox.y = Math.floor(pac.hitbox.y)
     }
 
     function pacDotEaten() {
@@ -367,31 +382,21 @@ document.addEventListener('DOMContentLoaded', ()=> {
         }
         powerTime = powerTime > 0 ? powerTime-1 : 0 
         if(powerTime > 0) { 
-            squares[pinkGhost.index].classList.remove(pinkGhost.name)
-            squares[redGhost.index].classList.remove(redGhost.name)
-            squares[orangeGhost.index].classList.remove(orangeGhost.name)
-            squares[blueGhost.index].classList.remove(blueGhost.name)
-            squares[pinkGhost.index].classList.add('powered')
-            squares[redGhost.index].classList.add('powered')
-            squares[orangeGhost.index].classList.add('powered')
-            squares[blueGhost.index].classList.add('powered')
-            pinkGhost.powered = true
-            redGhost.powered = true
-            blueGhost.powered = true
-            orangeGhost.powered = true
+            ghosts.forEach(
+                (ghost) => {
+                    squares[ghost.index].classList.remove(ghost.name)
+                    squares[ghost.index].classList.add('.powered')
+                    ghost.powered = true
+                }
+            )
         } else { 
-            squares[pinkGhost.index].classList.add(pinkGhost.name)
-            squares[redGhost.index].classList.add(redGhost.name)
-            squares[orangeGhost.index].classList.add(orangeGhost.name)
-            squares[blueGhost.index].classList.add(blueGhost.name)
-            squares[pinkGhost.index].classList.remove('powered')
-            squares[redGhost.index].classList.remove('powered')
-            squares[orangeGhost.index].classList.remove('powered')
-            squares[blueGhost.index].classList.remove('powered')
-            pinkGhost.powered = false
-            redGhost.powered = false
-            blueGhost.powered = false
-            orangeGhost.powered = false
+            ghosts.forEach(
+                (ghost) => {
+                    squares[ghost.index].classList.add(ghost.name)
+                    squares[ghost.index].classList.remove('.powered')
+                    ghost.powered = true
+                }
+            )
         }
     }
 
